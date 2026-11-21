@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171b50">
+<title>Flashcards – Verbes irréguliers</title>
+<style>
+:root{--navy:#171b50;--bg:#f4f5fa;--paper:#fff;--ink:#20243a;--muted:#74798d;--line:#dfe2ec;--red:#d94343;--green:#219765;--accent:#6255d9;--shadow:0 10px 30px rgba(24,29,75,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.app{max-width:850px;margin:0 auto;min-height:100vh;padding:0 18px 28px}
+header{background:var(--navy);color:white;margin:0 -18px 22px;padding:20px 20px 18px;text-align:center}
+header h1{font-size:clamp(20px,4vw,27px);margin:0;font-weight:750}
+header p{margin:5px 0 0;color:#d8daf0;font-size:13px}
+main{display:flex;flex-direction:column;gap:17px}
+.row{display:grid;gap:9px}
+.pages{grid-template-columns:repeat(3,1fr)}
+.btn{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:11px;padding:12px 8px;font-weight:700;font-size:14px;transition:.15s}
+.btn.active{background:#eae8ff;border:2px solid var(--accent);color:#373080;padding:11px 7px}
+.section-label{font-size:13px;font-weight:800;margin-bottom:8px}
+.categories{display:flex;flex-wrap:wrap;gap:8px}
+.cat{border:1px solid var(--line);background:white;border-radius:999px;padding:8px 13px;font-size:13px;font-weight:650;color:var(--ink)}
+.cat.active{background:#eae8ff;border-color:var(--accent);color:#373080}
+.stats{background:white;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:0 3px 12px rgba(24,29,75,.035)}
+.stats-top{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:750;margin-bottom:10px}
+.progress{height:10px;background:#e9eaf1;border-radius:99px;overflow:hidden}
+.progress>div{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .2s}
+.statnums{display:grid;grid-template-columns:1fr 1fr;text-align:center;margin-top:12px;gap:12px}
+.statnums strong{font-size:21px;display:block}
+.statnums span{font-size:12px;color:var(--muted)}
+.cardhead{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:750;color:var(--muted)}
+.card{height:clamp(250px,38vh,350px);min-height:245px;background:white;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;position:relative;overflow:hidden;touch-action:pan-y;user-select:none;transition:background .07s,transform .07s,border-color .07s}
+.card .eyebrow{font-size:11px;letter-spacing:1.5px;font-weight:850;color:#888da1;margin-bottom:22px}
+.card .front{font-size:clamp(28px,6vw,43px);font-weight:800;line-height:1.2}
+.card .back{font-size:clamp(18px,4.2vw,25px);line-height:1.8;font-weight:650}
+.card .hint{font-size:12px;color:#888da1;margin-top:25px}
+.answerline{display:flex;gap:8px;align-items:baseline;justify-content:center;flex-wrap:wrap}
+.answerline small{font-size:12px;color:#777d90;font-weight:600}
+.actions{grid-template-columns:1fr 1fr;gap:13px}
+.mark{border:0;border-radius:12px;padding:15px 8px;color:white;font-size:16px;font-weight:800;box-shadow:0 4px 9px rgba(0,0,0,.08)}
+.mark.red{background:var(--red)}.mark.green{background:var(--green)}
+.tools{grid-template-columns:repeat(3,1fr)}
+.tools .btn{padding:13px 5px;font-size:13px}
+.footnote{text-align:center;font-size:12px;color:var(--muted);line-height:1.5}
+.message{min-height:20px;text-align:center;font-size:13px;color:var(--muted)}
+@media(min-width:650px){.app{padding-left:28px;padding-right:28px}header{margin-left:-28px;margin-right:-28px}.card{height:330px}}
+@media(max-width:390px){.app{padding-left:12px;padding-right:12px}header{margin-left:-12px;margin-right:-12px}.btn{font-size:12px}.tools .btn{font-size:12px}.cat{font-size:12px;padding:7px 10px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header><h1>Verbes irréguliers anglais</h1><p>Flashcards de révision · Pages 1 et 2</p></header>
+<main>
+  <section class="row pages" aria-label="Choix de page">
+    <button class="btn active" data-page="1">Page 1</button>
+    <button class="btn" data-page="2">Page 2</button>
+    <button class="btn" data-page="all">Toutes les pages</button>
+  </section>
+  <section>
+    <div class="section-label">Catégorie</div>
+    <div class="categories" id="categories"></div>
+  </section>
+  <section class="stats">
+    <div class="stats-top"><span>Progression</span><span id="percent">0 %</span></div>
+    <div class="progress"><div id="progressbar"></div></div>
+    <div class="statnums">
+      <div><strong id="done">0 / 58</strong><span>Cartes faites</span></div>
+      <div><strong id="known">0 / 58</strong><span>Cartes SUS</span></div>
+    </div>
+  </section>
+  <div class="cardhead"><span id="position">Carte 1 / 58</span><span id="direction">FR → EN</span></div>
+  <section class="card" id="card" tabindex="0" role="button" aria-label="Retourner la flashcard">
+    <div class="eyebrow" id="side">DEVANT · FRANÇAIS</div>
+    <div class="front" id="front">Rencontrer</div>
+    <div class="back" id="back" hidden></div>
+    <div class="hint" id="hint">Appuie sur la carte pour voir les 3 formes anglaises</div>
+  </section>
+  <section class="row actions">
+    <button class="mark red" id="again">← À revoir</button>
+    <button class="mark green" id="sus">SUS →</button>
+  </section>
+  <section class="row tools">
+    <button class="btn" id="restart">↻ Recommencer</button>
+    <button class="btn" id="reverse">FR → EN</button>
+    <button class="btn" id="shuffle">⇄ Mélanger</button>
+  </section>
+  <div class="footnote">Glisse la carte vers la gauche pour « À revoir » ou vers la droite pour « SUS ».<br>Plus tu glisses, plus la carte prend la couleur correspondante.</div>
+  <div class="message" id="message" aria-live="polite">Prêt à réviser !</div>
+</main>
+</div>
+<script>
+const source = `
+Sport|meet|met|met|rencontrer
+Sport|beat|beat|beaten|battre
+Sport|hurt|hurt|hurt|faire mal / blesser
+Sport|quit|quit|quit|abandonner / arrêter
+Sport|strike|struck|struck|frapper
+Sport|hit|hit|hit|taper
+Sport|shoot|shot|shot|tirer / filmer
+Sport|fall|fell|fallen|tomber
+Sport|lead|led|led|mener / guider
+Sport|overcome|overcame|overcome|surmonter
+Sport|slide|slid|slid|glisser
+Sport|throw|threw|thrown|jeter
+Sport|bet|bet|bet|parier
+Sport|fight|fought|fought|se battre
+Sport|win|won|won|gagner
+Sport|bleed|bled|bled|saigner
+Sport|swear|swore|sworn|jurer
+Sport|swim|swam|swum|nager
+Sport|swing|swung|swung|se balancer
+Sport|run|ran|run|courir
+Sport|catch|caught|caught|attraper
+Sport|lose|lost|lost|perdre
+Daily Routine|sleep|slept|slept|dormir
+Daily Routine|shut|shut|shut|fermer
+Daily Routine|hold|held|held|tenir
+Daily Routine|find|found|found|trouver
+Daily Routine|rise|rose|risen|se lever
+Daily Routine|lay|laid|lain|poser / étendre
+Daily Routine|wake|woke|woken|réveiller
+Daily Routine|lie|lay|lain|s'allonger
+Daily Routine|sit|sat|sat|s'asseoir
+Daily Routine|dream|dreamt|dreamt|rêver
+Daily Routine|light|lit|lit|allumer
+Daily Routine|set|set|set|installer
+Movement|be|was / were|been|être
+Movement|seek|sought|sought|chercher
+Movement|ride|rode|ridden|chevaucher
+Movement|go|went|gone|aller
+Movement|leave|left|left|laisser / partir
+Movement|bring|brought|brought|apporter
+Movement|hide|hid|hidden|cacher
+Movement|fly|flew|flown|voler
+Movement|drive|drove|driven|conduire
+Movement|bend|bent|bent|plier / courber
+Movement|come|came|come|venir
+Movement|send|sent|sent|envoyer
+Conversation|withdraw|withdrew|withdrawn|se retirer
+Conversation|deal|dealt|dealt|distribuer
+Conversation|forget|forgot|forgotten|oublier
+Conversation|do|did|done|faire
+Conversation|begin|began|begun|commencer
+Conversation|feel|felt|felt|sentir / éprouver
+Conversation|hear|heard|heard|entendre
+Conversation|forbid|forbade|forbidden|interdire
+Conversation|bear|bore|borne|porter / supporter
+Conversation|weep|wept|wept|pleurer
+Conversation|forgive|forgave|forgiven|pardonner
+Conversation|say|said|said|dire
+Food|split|split|split|séparer
+Food|feed|fed|fed|nourrir
+Food|make|made|made|faire / fabriquer
+Food|bite|bit|bitten|mordre
+Food|smell|smelt|smelt|sentir
+Food|burn|burnt|burnt|brûler
+Food|spread|spread|spread|étaler
+Food|drink|drank|drunk|boire
+Food|eat|ate|eaten|manger
+Food|shake|shook|shaken|secouer
+Food|spoil|spoilt|spoilt|gâcher / gâter
+Food|sink|sank|sunk|couler
+Food|grow|grew|grown|grandir / pousser
+Shopping|take|took|taken|prendre
+Shopping|choose|chose|chosen|choisir
+Shopping|buy|bought|bought|acheter
+Shopping|hang|hung|hung|accrocher / pendre
+Shopping|get|got|got|obtenir
+Shopping|tear|tore|torn|déchirer
+Shopping|pay|paid|paid|payer
+Shopping|have|had|had|avoir
+Shopping|sell|sold|sold|vendre
+Shopping|cut|cut|cut|couper
+Shopping|lend|lent|lent|prêter
+Shopping|break|broke|broken|casser
+Shopping|steal|stole|stolen|dérober
+Shopping|keep|kept|kept|garder
+Shopping|give|gave|given|donner
+Shopping|put|put|put|mettre / poser
+Shopping|wear|wore|worn|porter un vêtement
+Shopping|spend|spent|spent|dépenser / passer du temps
+Shopping|cost|cost|cost|coûter
+Weather|broadcast|broadcast|broadcast|diffuser
+Weather|shine|shone|shone|briller
+Weather|freeze|froze|frozen|geler
+Weather|forecast|forecast|forecast|prévoir
+School|teach|taught|taught|enseigner
+School|stick|stuck|stuck|coller
+School|read|read|read|lire
+School|draw|drew|drawn|dessiner
+School|understand|understood|understood|comprendre
+School|see|saw|seen|voir
+School|let|let|let|permettre / laisser
+School|speak|spoke|spoken|parler
+School|build|built|built|construire
+School|ring|rang|rung|sonner / téléphoner
+School|sing|sang|sung|chanter
+School|learn|learnt|learnt|apprendre
+School|stand|stood|stood|être debout
+School|think|thought|thought|penser
+School|write|wrote|written|écrire
+School|tell|told|told|dire / raconter
+School|become|became|become|devenir
+School|know|knew|known|connaître / savoir
+`.trim();
+
+const verbs = source.split('\n').map((line,i)=>{
+  const [cat,base,past,part,fr]=line.split('|');
+  return {id:i,cat,base,past,part,fr,page:i<58?1:2,status:null};
+});
+const pageCategories={
+  '1':['Sport','Daily Routine','Movement','Conversation'],
+  '2':['Food','Shopping','Weather','School'],
+  'all':['Sport','Daily Routine','Movement','Conversation','Food','Shopping','Weather','School']
+};
+let page='1',category='Tout',deck=[],index=0,flipped=false,reverse=false;
+let dragStart=null,dragDelta=0,ignoreClick=false;
+const $=id=>document.getElementById(id);
+const savedKey='irregularFlashcardsProgressV1';
+try{
+ const saved=JSON.parse(localStorage.getItem(savedKey)||'{}');
+ verbs.forEach(v=>{if(saved[v.id]==='again'||saved[v.id]==='sus')v.status=saved[v.id]});
+}catch(e){}
+function persist(){try{localStorage.setItem(savedKey,JSON.stringify(Object.fromEntries(verbs.map(v=>[v.id,v.status]).filter(x=>x[1]))))}catch(e){}}
+function filtered(){return verbs.filter(v=>(page==='all'||String(v.page)===page)&&(category==='Tout'||v.cat===category))}
+function buildDeck(resetProgress=false){deck=filtered();if(resetProgress){deck.forEach(v=>v.status=null);persist()}index=0;flipped=false;draw();drawCategories()}
+function drawCategories(){
+ const holder=$('categories');holder.innerHTML='';
+ ['Tout',...pageCategories[page]].forEach(c=>{
+  const b=document.createElement('button');b.className='cat'+(category===c?' active':'');b.textContent=c;
+  b.onclick=()=>{category=c;buildDeck(true);$('message').textContent='Catégorie : '+c+' · compteurs remis à zéro'};
+  holder.appendChild(b);
+ });
+}
+function draw(){
+ const total=deck.length,done=deck.filter(v=>v.status!==null).length,sus=deck.filter(v=>v.status==='sus').length;
+ const pct=total?Math.round(done/total*100):0;
+ $('done').textContent=done+' / '+total;$('known').textContent=sus+' / '+total;
+ $('percent').textContent=pct+' %';$('progressbar').style.width=pct+'%';
+ $('position').textContent=total?`Carte ${index+1} / ${total}`:'Aucune carte';
+ $('direction').textContent=reverse?'EN → FR':'FR → EN';
+ const v=deck[index];
+ $('front').textContent=v?(reverse?v.base:v.fr):'Sélection terminée';
+ $('back').hidden=!flipped;
+ $('back').innerHTML=v?(`<div class="answerline"><small>Base verbale</small><strong>${escapeHTML(v.base)}</strong></div><div class="answerline"><small>Prétérit</small><strong>${escapeHTML(v.past)}</strong></div><div class="answerline"><small>Participe passé</small><strong>${escapeHTML(v.part)}</strong></div><div class="answerline" style="margin-top:10px;padding-top:9px;border-top:1px solid var(--line)"><small>Traduction</small><strong>${escapeHTML(v.fr)}</strong></div>`):'';
+ $('side').textContent=flipped?(reverse?'FRANÇAIS':'LES 3 FORMES ANGLAISES'):(reverse?'ANGLAIS':'DEVANT · FRANÇAIS');
+ $('hint').textContent=flipped?'Appuie pour cacher la réponse':'Appuie sur la carte pour voir les 3 formes anglaises';
+ $('card').style.transform='';$('card').style.background='white';$('card').style.borderColor='var(--line)';
+ $('again').disabled=!v;$('sus').disabled=!v;
+}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function mark(status){
+ const v=deck[index];if(!v)return;
+ v.status=status;persist();
+ let next=deck.findIndex((x,i)=>i>index&&x.status===null);
+ if(next<0)next=deck.findIndex(x=>x.status===null);
+ if(next>=0){index=next;flipped=false;draw();$('message').textContent=status==='sus'?'Carte marquée SUS ✓':'Carte marquée À revoir'}
+ else{flipped=false;draw();$('message').textContent='Toutes les cartes de cette sélection ont été faites !'}
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>{
+ page=b.dataset.page;category='Tout';
+ document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x===b));
+ buildDeck(true);$('message').textContent=(page==='all'?'Toutes les pages sélectionnées':'Page '+page+' sélectionnée')+' · compteurs remis à zéro';
+}));
+$('card').addEventListener('click',()=>{if(ignoreClick){ignoreClick=false;return}if(!deck.length)return;flipped=!flipped;draw()});
+$('card').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flipped=!flipped;draw()}});
+$('again').onclick=()=>mark('again');$('sus').onclick=()=>mark('sus');
+$('restart').onclick=()=>{
+ if(!confirm('Recommencer cette sélection ? Les réponses À revoir et SUS de ces cartes seront effacées.'))return;
+ deck.forEach(v=>v.status=null);persist();index=0;flipped=false;draw();$('message').textContent='Cette sélection a été recommencée';
+};
+$('reverse').onclick=()=>{reverse=!reverse;$('reverse').textContent=reverse?'EN → FR':'FR → EN';flipped=false;draw()};
+$('shuffle').onclick=()=>{for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}index=0;flipped=false;draw();$('message').textContent='Ordre des cartes mélangé'};
+const card=$('card');
+card.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ dragStart=e.clientX;dragDelta=0;card.setPointerCapture(e.pointerId);
+});
+card.addEventListener('pointermove',e=>{
+ if(dragStart===null)return;
+ dragDelta=e.clientX-dragStart;
+ const intensity=Math.min(1,Math.abs(dragDelta)/145);
+ const rgb=dragDelta<0?'217,67,67':'33,151,101';
+ card.style.transform=`translateX(${Math.max(-100,Math.min(100,dragDelta))}px) rotate(${Math.max(-7,Math.min(7,dragDelta/20))}deg)`;
+ card.style.background=`rgba(${rgb},${intensity*.36})`;
+ card.style.borderColor=dragDelta<0?`rgba(217,67,67,${intensity})`:`rgba(33,151,101,${intensity})`;
+});
+function finishSwipe(e){
+ if(dragStart===null)return;
+ const dx=e.clientX-dragStart;dragStart=null;
+ if(Math.abs(dx)>65){ignoreClick=true;mark(dx<0?'again':'sus')}
+ else{card.style.transform='';card.style.background='white';card.style.borderColor='var(--line)';}
+}
+card.addEventListener('pointerup',finishSwipe);
+card.addEventListener('pointercancel',()=>{dragStart=null;card.style.transform='';card.style.background='white';card.style.borderColor='var(--line)'});
+buildDeck();
+</script>
+</body>
+</html>
